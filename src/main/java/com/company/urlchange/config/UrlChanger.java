@@ -1,5 +1,6 @@
 package com.company.urlchange.config;
 
+import com.company.urlchange.service.Helper;
 import com.company.urlchange.view.addbook.AddBook;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -7,6 +8,7 @@ import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.server.VaadinService;
 import io.jmix.flowui.DialogWindows;
 import io.jmix.flowui.view.StandardView;
+import io.jmix.flowui.view.builder.WindowBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -19,14 +21,18 @@ public class UrlChanger {
 
     public UrlChanger(List<UrlChangerConfig> configs, DialogWindows dialogWindows) {
         this.dialogWindows = dialogWindows;
-        for (UrlChangerConfig config : configs) {
-            go(config);
-        }
+        goConfigList(configs);
     }
 
     public UrlChanger(UrlChangerConfig config, DialogWindows dialogWindows) {
         this.dialogWindows = dialogWindows;
         go(config);
+    }
+
+    private void goConfigList(List<UrlChangerConfig> configs){
+        for (UrlChangerConfig config : configs) {
+            go(config);
+        }
     }
 
     private void go(UrlChangerConfig config) {
@@ -39,7 +45,7 @@ public class UrlChanger {
             page.getHistory().replaceState(null, getUrl(config.getQueryParams(), referer));
 
             if (Objects.nonNull(config.getOpenViewInDialog()))
-                openViewAddBook(config);
+                openDialogView(config);
 
             config.getConsumer().accept(button);
         }));
@@ -60,21 +66,38 @@ public class UrlChanger {
         return referer + sj;
     }
 
-    private void openViewAddBook(UrlChangerConfig config) {
+    private void openDialogView(UrlChangerConfig config) {
 
-        dialogWindows.view(config.getView(), config.getOpenViewInDialog())
-                .withAfterCloseListener(afterCloseEvent -> close(config))
+        getWindowBuilder(config.getView(), config.getOpenViewInDialog())
+                .withAfterCloseListener(afterCloseEvent -> close(config.getQueryParams(), config.getButton()))
                 .open();
     }
 
-    private void close(UrlChangerConfig config) {
+    private WindowBuilder<? extends StandardView> getWindowBuilder(StandardView view, Class<? extends StandardView> openView) {
+        return dialogWindows.view(view, openView);
+    }
+
+    private void close(Map<String, String> queryParams, Button button) {
         String referer = VaadinService.getCurrentRequest().getHeader("referer");
-        for (Map.Entry<String, String> stringStringEntry : config.getQueryParams().entrySet()) {
+        for (Map.Entry<String, String> stringStringEntry : queryParams.entrySet()) {
             referer = referer.replaceAll(stringStringEntry.getKey() + "=" + stringStringEntry.getValue() + "&?", "");
         }
         String clearedUrl = referer;
-        config.getButton().getUI().ifPresent(ui -> ui.getPage().getHistory().pushState(null, clearedUrl));
+        button.getUI().ifPresent(ui -> ui.getPage().getHistory().pushState(null, clearedUrl));
     }
 
+    public void initViews(StandardView view, List<ViewWithParameters> openViews){
+        String url = VaadinService.getCurrentRequest().getHeader("referer");
+        Map<String, String> headers = Helper.getHeaders(url);
+
+        for (ViewWithParameters openView : openViews) {
+            for (String key : openView.getQueryParams().keySet()) {
+                if (headers.containsKey(key)) {
+                    getWindowBuilder(view, openView.getOpenView()).withAfterCloseListener(closeEvent ->
+                            close(openView.getQueryParams(), ));
+                }
+            }
+        }
+    }
 
 }

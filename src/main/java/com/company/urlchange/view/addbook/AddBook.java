@@ -49,21 +49,6 @@ public class AddBook extends StandardView {
 
         UrlChangerConfig deleteBookConf = new UrlChangerConfig(button, consumer, queryParams, this, DeleteBook.class);
         new UrlChanger(deleteBookConf,dialogWindows);
-
-
-    }
-
-    private void openViewDeleteBook() {
-
-        dialogWindows.view(this, DeleteBook.class)
-                .withAfterCloseListener(afterCloseEvent -> {
-                    String url = VaadinService.getCurrentRequest().getHeader("referer");
-
-                    url = url.substring(0, url.lastIndexOf("&"));
-
-                    getUI().get().getPage().getHistory().replaceState(null,url);
-                })
-                .open();
     }
 
 }

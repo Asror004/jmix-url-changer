@@ -42,27 +42,13 @@ public class BlankView extends StandardView {
         }};
 
         UrlChangerConfig addBookConf = new UrlChangerConfig(button, consumer, queryParams, this, AddBook.class);
-//        UrlChangerConfig deleteBookConf = new UrlChangerConfig(button, consumer, queryParams, this, DeleteBook.class);
 
         new UrlChanger(addBookConf, dialogWindows);
 
         getContent().add(button);
 
 
-
-
-
-
-
-
-
-
-
-
-
-//        String url = VaadinService.getCurrentRequest().getHeader("referer");
 //
-//        Map<String, String> headers = Helper.getHeaders(url);
 //
 //        if (headers.containsKey("name")) {
 //            openViewAddBook();
