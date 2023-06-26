@@ -1,6 +1,8 @@
 package com.company.urlchange.view.addbook;
 
 
+import com.company.urlchange.config.UrlChanger;
+import com.company.urlchange.config.UrlChangerConfig;
 import com.company.urlchange.service.Helper;
 import com.company.urlchange.view.deletebook.DeleteBook;
 import com.company.urlchange.view.main.MainView;
@@ -12,7 +14,9 @@ import com.vaadin.flow.server.VaadinService;
 import io.jmix.flowui.DialogWindows;
 import io.jmix.flowui.view.*;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Route(value = "add-book", layout = MainView.class)
 @ViewController("AddBook")
@@ -33,14 +37,19 @@ public class AddBook extends StandardView {
         button.getStyle().set("color", "white");
         button.setId("openModal");
 
-        button.addClickListener(listener -> {
-            String referer = VaadinService.getCurrentRequest().getHeader("referer");
-            getUI().get().getPage().getHistory().replaceState(null,referer + "&bookId=1");
-
-            openViewDeleteBook();
-        });
 
         getContent().add(button);
+
+        Consumer<Button> consumer = btn -> btn.getStyle().set("background-color", "green");
+
+        HashMap<String, String> queryParams = new HashMap<>() {{
+            put("bookId", "2");
+            put("user", "boob");
+        }};
+
+        UrlChangerConfig deleteBookConf = new UrlChangerConfig(button, consumer, queryParams, this, DeleteBook.class);
+        new UrlChanger(deleteBookConf,dialogWindows);
+
 
     }
 

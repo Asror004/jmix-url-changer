@@ -16,6 +16,7 @@ import io.jmix.flowui.view.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -40,9 +41,10 @@ public class BlankView extends StandardView {
             put("username", "boob");
         }};
 
-        UrlChangerConfig config = new UrlChangerConfig(button, consumer, queryParams, this, AddBook.class);
+        UrlChangerConfig addBookConf = new UrlChangerConfig(button, consumer, queryParams, this, AddBook.class);
+//        UrlChangerConfig deleteBookConf = new UrlChangerConfig(button, consumer, queryParams, this, DeleteBook.class);
 
-        new UrlChanger(config, dialogWindows);
+        new UrlChanger(addBookConf, dialogWindows);
 
         getContent().add(button);
 
