@@ -3,6 +3,7 @@ package com.company.urlchange.view.blank;
 
 import com.company.urlchange.config.UrlChanger;
 import com.company.urlchange.config.UrlChangerConfig;
+import com.company.urlchange.config.ViewWithParameters;
 import com.company.urlchange.service.Helper;
 import com.company.urlchange.view.addbook.AddBook;
 import com.company.urlchange.view.deletebook.DeleteBook;
@@ -38,14 +39,19 @@ public class BlankView extends StandardView {
 
         HashMap<String, String> queryParams = new HashMap<>() {{
             put("userId", "2");
-            put("username", "boob");
+            put("username", "19");
         }};
 
         UrlChangerConfig addBookConf = new UrlChangerConfig(button, consumer, queryParams, this, AddBook.class);
 
-        new UrlChanger(addBookConf, dialogWindows);
+        UrlChanger urlChanger = new UrlChanger(addBookConf, dialogWindows);
+        urlChanger.initViews(this,List.of(new ViewWithParameters(AddBook.class,queryParams),new ViewWithParameters(DeleteBook.class,Map.of(
+                "bookId","2","user","boob"
+        ))));
 
         getContent().add(button);
+
+
 
 
 //
